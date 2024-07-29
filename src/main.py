@@ -3,6 +3,7 @@ import logging
 import os
 import re
 
+import click
 from actual import Actual
 from actual.queries import get_transactions, create_transaction
 from dotenv import load_dotenv
@@ -58,21 +59,47 @@ def update_values(name, value, account, actual):
     actual.commit()
 
 
-if __name__ == '__main__':
+@click.command()
+@click.option('--all', help='Update everything', is_flag=True)
+@click.option('--aggregate', help='Aggregate all payees based on the payee aggregates configuration', is_flag=True)
+@click.option('--car', help='Update car values', is_flag=True)
+@click.option('--house', help='Update house values', is_flag=True)
+def main(all, aggregate, car, house):
     license_plates = os.getenv('LICENSE_PLATES', '').split(',')
     houses = os.getenv('HJEMLA_URLS', '').split(',')
 
     car_values, house_values = {}, {}
 
-    if license_plates != [''] and license_plates:
+    if all:
+        aggregate = True
+        car = True
+        house = True
+
+    logger.info(f'Houses: {house}')
+    logger.info(f'Car: {car}')
+    logger.info(f'Payee aggregation: {aggregate}')
+
+    if license_plates != [''] and license_plates and car:
         car_values = get_car_median_estimates(license_plates)
-    if houses != [''] and houses:
+    if houses != [''] and houses and house:
         house_values = get_house_median_estimates(houses)
 
     with Actual(base_url=ACTUAL_URL, password=ACTUAL_PWD, encryption_password=ACTUAL_ENCRYPTION_PASSWORD,
                 file=ACTUAL_FILE) as actual:
-        for license_plate, value in car_values.items():
-            update_values(license_plate, value, ACTUAL_CAR_ACCOUNT, actual)
-        for house, value in house_values.items():
-            update_values(house, value, ACTUAL_MORTGAGE_ACCOUNT, actual)
-        aggregate_all_payees(actual)
+        if all:
+            aggregate = True
+            car = True
+            house = True
+
+        if car:
+            for license_plate, value in car_values.items():
+                update_values(license_plate, value, ACTUAL_CAR_ACCOUNT, actual)
+        if house:
+            for house, value in house_values.items():
+                update_values(house, value, ACTUAL_MORTGAGE_ACCOUNT, actual)
+        if aggregate:
+            aggregate_all_payees(actual)
+
+
+if __name__ == '__main__':
+    main()

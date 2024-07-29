@@ -24,11 +24,9 @@ TODO:
 
 ## Usage
 
-Simply run the script periodically to update the values in your Actual budget. There's no reason to run it more than
-once per week or even per month, as the values are not likely to change that often.
+Some environment variables are required to run the script, see the `.env.example` file for more details.
 
-Environment variables are used to specify the license plates and hjemla URLs to use. See the `.env.example` file for
-details.
+Run `python main.py --help` to see the available options. Docker image coming soon.
 
 ## Modules
 

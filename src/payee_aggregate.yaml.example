@@ -1,4 +1,33 @@
+# Reise
+Taxfree:
+  - \bDuty ?free\b
+  - \bTax ?free\b
+
+# Parkering
+Easypark: \beasypark\b
+Autopay: \bautopay\b
+
+# Spill
+Steam: \bsteam\b
+
+# Elektronikk
+Elkjøp: \belkjoe?p\b
+Elektroimportøren: \belektroimportoeren\b
+Kjell & Co:
+  - \bkjell ?& ?co\b
+  - \bkjell ?& ?company\b
+Komplett: \bkomplett\.no\b
+Proshop: \bproshop\b
+
+# Byggevarehus
+Biltema: \bbiltema\b
 Coop Obs Bygg: \bcoop obs bygg\b
-Coop:
-  - \bextra\b
-  - \bcoop obs\b
+IKEA: \bikea\b
+Jula: \bjula\b
+
+# Matbutikker
+Coop Obs: \b(coop )?obs ?(?!bygg)\b
+Coop Extra: \bextra\b
+Kiwi: \bkiwi\b
+Helgø Meny: \bhelgoe meny\b
+Rema 1000: \brema\b

@@ -100,6 +100,10 @@ def main(all, aggregate, car, house):
         if aggregate:
             aggregate_all_payees(actual)
 
+        # Run rules
+        actual.run_rules()
+        actual.commit()
+
 
 if __name__ == '__main__':
     main()

@@ -25,7 +25,6 @@ def _aggregate(transaction, payee_aggregates):
 def aggregate_all_payees(actual):
     """Aggregate all payees based on the payee aggregates configuration"""
     payee_aggregates = read_payee_aggregate()
-    logging.info(f'Payee aggregates: {payee_aggregates}')
     merged_payees = {}
     for transaction in get_transactions(actual.session):
         # Find payee aggregate for the transaction

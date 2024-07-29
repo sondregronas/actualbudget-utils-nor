@@ -18,6 +18,10 @@ TODO:
   difference is posted to the Actual budget as a transaction based on the last known value (LKV). Only updates the
   assets estimated value (You can still add/track debt yourself in the same account).
 
+- **Payee Aggregation** - Modify `payee_aggregate.yaml` with Payee: regex (or list of regexes) to aggregate/merge
+  payees. See the example file for more details. This is useful for when you have multiple payees that should be
+  aggregated into one, i.e. "Store Name" and "Store Name - Location" could be aggregated into "Store Name".
+
 ## Usage
 
 Simply run the script periodically to update the values in your Actual budget. There's no reason to run it more than
@@ -37,3 +41,7 @@ Gets the value of a car based on the registration number via `https://regnr.no/[
 Gets the value of a house based on the hjemla URL where the house price is listed ("Se mer" modal).
 
 Example URL: `https://www.hjemla.no/boligkart?search=lat_lon_addresse-1_1234_Postnummer&z=16&showPanel=true&unit=H1234`
+
+### Payee Aggregation
+
+Modify `payee_aggregate.yaml` with Payee: regex (or list of regexes) to aggregate/merge payees. See the example file

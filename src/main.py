@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from carvalue import get_car_median_estimates
 from hjemla import get_house_median_estimates
+from payee_aggregate import aggregate_all_payees
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -74,3 +75,4 @@ if __name__ == '__main__':
             update_values(license_plate, value, ACTUAL_CAR_ACCOUNT, actual)
         for house, value in house_values.items():
             update_values(house, value, ACTUAL_MORTGAGE_ACCOUNT, actual)
+        aggregate_all_payees(actual)

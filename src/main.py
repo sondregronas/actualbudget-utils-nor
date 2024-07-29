@@ -59,8 +59,8 @@ def update_values(name, value, account, actual):
 
 
 if __name__ == '__main__':
-    license_plates = os.getenv('LICENSE_PLATES').split(',')
-    houses = os.getenv('HJEMLA_URLS').split(',')
+    license_plates = os.getenv('LICENSE_PLATES', '').split(',')
+    houses = os.getenv('HJEMLA_URLS', '').split(',')
 
     car_values, house_values = {}, {}
 

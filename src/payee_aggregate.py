@@ -67,17 +67,20 @@ def aggregate_all_payees(actual, transactions):
         transaction.payee_id = p.id
 
     # Merge the payees (delete the old ones)
+    aggregation_count = 0
     for _, payees in merged_payees.items():
         for id, name in payees:
             p = get_payee(actual.session, name)
             if not p:
                 continue
             p.delete()
+            aggregation_count += 1
             logging.info(f'Merged payee: ({name})')
             logging.debug(f'Payee ID: ({id})')
 
     # Fin
     if merged_payees:
-        logging.info(f'Aggregated payees: {merged_payees}')
+        logging.info(f'Aggregated {aggregation_count} payees')
+        logging.debug(f'Aggregated payees: {merged_payees}')
     else:
         logging.info('No payees to aggregate')

@@ -24,11 +24,27 @@ TODO:
   payees. See the example file for more details. This is useful for when you have multiple payees that should be
   aggregated into one, i.e. "Store Name" and "Store Name - Location" could be aggregated into "Store Name".
 
+- **Bank Sync** - Triggers a bank sync for all accounts in Actual. This is useful if you want to automate the bank sync
+  process.
+
 ## Usage
 
 Some environment variables are required to run the script, see the `.env.example` file for more details.
 
 Run `python main.py --help` to see the available options. Docker image coming soon.
+
+```shell
+Options:
+  -v, --debug       Enable debug logging
+  --dry-run, --dry  Dry run
+  -a, --all         Update everything
+  -p, --aggregate   Aggregate all payees based on the payee aggregates
+                    configuration
+  -c, --car         Update car values
+  -h, --house       Update house values
+  -b, --bank-sync   Run bank sync on all accounts
+  --help            Show this message and exit.
+  ```
 
 ## Modules
 

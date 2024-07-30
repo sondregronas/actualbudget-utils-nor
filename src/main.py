@@ -1,13 +1,13 @@
-import datetime
 import logging
 import os
-import re
+from functools import partial
 
 import click
 from actual import Actual
-from actual.queries import get_transactions, create_transaction
+from actual.queries import get_transactions
 from dotenv import load_dotenv
 
+from assets import update_asset_value
 from carvalue import get_car_median_estimates
 from hjemla import get_house_median_estimates
 from payee_aggregate import aggregate_all_payees
@@ -26,45 +26,21 @@ ACTUAL_CAR_ACCOUNT = os.getenv('ACTUAL_CAR_ACCOUNT', None)
 ACTUAL_MORTGAGE_ACCOUNT = os.getenv('ACTUAL_MORTGAGE_ACCOUNT', None)
 
 
-def _get_generated_transactions(account, actual):
-    """A small hack to make sure we only get the transactions we've generated"""
-    transactions = get_transactions(actual.session, account=account)
-    return [t for t in transactions if t.notes and '[Automated]' in t.notes and 'LKV' in t.notes]
-
-
-def _get_last_known_value(name, account, actual):
-    """Get the last known value of an entity with the given name in the given account"""
-    transactions = _get_generated_transactions(account, actual)
-    for t in transactions:
-        if name in t.notes:
-            return int(re.search(r'LKV: (\d+)', t.notes).group(1))
-    return 0
-
-
-def update_values(name, value, account, actual):
-    """Post the difference between the last known value and the current value to the given account"""
-    diff = value - _get_last_known_value(name, account, actual)
-    if diff == 0:
-        logging.info(f'No difference in value for {name}')
-        return
-    logging.info(f'Posting difference of {diff} for {name}')
-    create_transaction(
-        actual.session,
-        datetime.date.today(),
-        account,
-        ACTUAL_PAYEE,
-        notes=f'[Automated] {name} - LKV: {value}',
-        amount=diff,
-    )
-    actual.commit()
-
-
 @click.command()
+@click.option('--debug', help='Enable debug logging', is_flag=True)
+@click.option('--dry-run', help='Dry run', is_flag=True)
 @click.option('--all', help='Update everything', is_flag=True)
 @click.option('--aggregate', help='Aggregate all payees based on the payee aggregates configuration', is_flag=True)
 @click.option('--car', help='Update car values', is_flag=True)
 @click.option('--house', help='Update house values', is_flag=True)
-def main(all, aggregate, car, house):
+def main(debug, dry_run, all, aggregate, car, house):
+    if debug:
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.debug('Debug logging enabled')
+
+    if dry_run:
+        logging.info('Dry run enabled - no changes will be committed')
+
     license_plates = os.getenv('LICENSE_PLATES', '').split(',')
     houses = os.getenv('HJEMLA_URLS', '').split(',')
 
@@ -86,23 +62,29 @@ def main(all, aggregate, car, house):
 
     with Actual(base_url=ACTUAL_URL, password=ACTUAL_PWD, encryption_password=ACTUAL_ENCRYPTION_PASSWORD,
                 file=ACTUAL_FILE) as actual:
-        if all:
-            aggregate = True
-            car = True
-            house = True
+        transactions = get_transactions(actual.session)
+
+        # Partial function to update assets
+        update_asset = partial(update_asset_value,
+                               account=ACTUAL_CAR_ACCOUNT,
+                               payee=ACTUAL_PAYEE,
+                               actual=actual,
+                               transactions=transactions)
 
         if car:
-            for license_plate, value in car_values.items():
-                update_values(license_plate, value, ACTUAL_CAR_ACCOUNT, actual)
+            [update_asset(car, value) for car, value in car_values.items()]
         if house:
-            for house, value in house_values.items():
-                update_values(house, value, ACTUAL_MORTGAGE_ACCOUNT, actual)
+            [update_asset(house, value) for house, value in house_values.items()]
         if aggregate:
-            aggregate_all_payees(actual)
+            aggregate_all_payees(actual, transactions)
 
         # Run rules
         actual.run_rules()
+        if dry_run:
+            logging.info('Dry run concluded - no changes were committed')
+            return
         actual.commit()
+        logging.info('Completed successfully')
 
 
 if __name__ == '__main__':

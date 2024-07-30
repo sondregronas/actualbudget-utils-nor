@@ -1,15 +1,31 @@
-import logging
 import re
+from logging import getLogger
 
 import yaml
-from actual.queries import get_transactions, get_or_create_payee, get_payee
+from actual.queries import get_or_create_payee, get_payee
+
+logging = getLogger()
+
+
+def add_regex_boundaries(entry: str):
+    """Add regex word boundaries to the entry if they are not already there"""
+    entry = f'\\b{entry}' if not entry.startswith('\\b') else entry
+    entry = f'{entry}\\b' if not entry.endswith('\\b') else entry
+    return entry
 
 
 def read_payee_aggregate() -> dict[str, str]:
     """Read the payee aggregate configuration from a YAML file and return it as a dictionary"""
     with open('payee_aggregate.yaml', 'r', encoding='utf8') as f:
         # Convert lists to (|)-separated, if it is a list, otherwise return the value as is
-        return {k: f"({'|'.join(v)})" if isinstance(v, list) else v for k, v in yaml.safe_load(f).items()}
+        payee_aggregates = {}
+        for k, v in yaml.safe_load(f).items():
+            if isinstance(v, list):
+                entries = [add_regex_boundaries(str(entry)) for entry in v]
+                payee_aggregates[k] = f"({'|'.join(entries)})"
+                continue
+            payee_aggregates[k] = add_regex_boundaries(str(v))
+        return payee_aggregates
 
 
 def _aggregate(transaction, payee_aggregates):
@@ -22,11 +38,12 @@ def _aggregate(transaction, payee_aggregates):
     return transaction.payee, False
 
 
-def aggregate_all_payees(actual):
+def aggregate_all_payees(actual, transactions):
     """Aggregate all payees based on the payee aggregates configuration"""
     payee_aggregates = read_payee_aggregate()
+    logging.debug(f'Payee aggregates: {payee_aggregates}')
     merged_payees = {}
-    for transaction in get_transactions(actual.session):
+    for transaction in transactions:
         # Find payee aggregate for the transaction
         new_payee, to_be_aggregated = _aggregate(transaction, payee_aggregates)
         if not to_be_aggregated or transaction.payee.name == new_payee:
@@ -56,10 +73,10 @@ def aggregate_all_payees(actual):
             if not p:
                 continue
             p.delete()
-            logging.info(f'Merged payee: {id} ({name})')
+            logging.info(f'Merged payee: ({name})')
+            logging.debug(f'Payee ID: ({id})')
 
     # Fin
-    actual.commit()
     if merged_payees:
         logging.info(f'Aggregated payees: {merged_payees}')
     else:

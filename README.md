@@ -7,10 +7,12 @@ Some Norway based utilities for Actual for my personal use.
 TODO:
 
 - [ ] Docker image that runs the script periodically, instead of relying on cron
+- [ ] Automatically update categories using payee aggregation as well? Or update based on other transactions with the
+  same payee?
 
 ## What it does (for now)
 
-- **Car Value** - Queries regnr.no to get an estimated median value of a car based on the license plate _via selenium_
+- **Car Value** - Queries regnr.no to get an estimated median value of a car based on the license plate _via selenium_.
   The difference is posted to the Actual budget as a transaction based on the last known value (LKV). Only updates the
   assets estimated value (You can still add/track debt yourself in the same account).
 

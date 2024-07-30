@@ -1,33 +1,36 @@
+# NOTE: Will always try to match whole words (wraps a leading & trailing \b around the regex automatically).
+#       If you want to match not whole words, you can use .+? at the beginning and/or end of the regex.
+
 # Reise
 Taxfree:
-  - \bDuty ?free\b
-  - \bTax ?free\b
+  - Duty ?free
+  - Tax ?free
 
 # Parkering
-Easypark: \beasypark\b
-Autopay: \bautopay\b
+Easypark: easypark
+Autopay: autopay
 
 # Spill
-Steam: \bsteam\b
+Steam: steam
 
 # Elektronikk
-Elkjøp: \belkjoe?p\b
-Elektroimportøren: \belektroimportoeren\b
+Elkjøp: elkjoe?p
+Elektroimportøren: elektroimportoeren
 Kjell & Co:
-  - \bkjell ?& ?co\b
-  - \bkjell ?& ?company\b
-Komplett: \bkomplett\.no\b
-Proshop: \bproshop\b
+  - kjell ?& ?co
+  - kjell ?& ?company
+Komplett: komplett\.no
+Proshop: proshop
 
 # Byggevarehus
-Biltema: \bbiltema\b
-Coop Obs Bygg: \bcoop obs bygg\b
-IKEA: \bikea\b
-Jula: \bjula\b
+Biltema: biltema
+Coop Obs Bygg: coop obs bygg
+IKEA: ikea
+Jula: jula
 
 # Matbutikker
-Coop Obs: \b(coop )?obs ?(?!bygg)\b
-Coop Extra: \bextra\b
-Kiwi: \bkiwi\b
-Helgø Meny: \bhelgoe meny\b
-Rema 1000: \brema\b
+Coop Obs: (coop )?obs ?(?!bygg)
+Coop Extra: extra
+Kiwi: kiwi
+Helgø Meny: helgoe meny
+Rema 1000: rema

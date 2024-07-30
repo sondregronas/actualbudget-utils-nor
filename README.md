@@ -7,8 +7,6 @@ Some Norway based utilities for Actual for my personal use.
 TODO:
 
 - [ ] Docker image that runs the script periodically, instead of relying on cron
-- [ ] Automatically update categories using payee aggregation as well? Or update based on other transactions with the
-  same payee?
 
 ## What it does (for now)
 
@@ -22,7 +20,9 @@ TODO:
 
 - **Payee Aggregation** - Modify `payee_aggregate.yaml` with Payee: regex (or list of regexes) to aggregate/merge
   payees. See the example file for more details. This is useful for when you have multiple payees that should be
-  aggregated into one, i.e. "Store Name" and "Store Name - Location" could be aggregated into "Store Name".
+  aggregated into one, i.e. "Store Name" and "Store Name - Location" could be aggregated into "Store Name". Can also
+  be used to update the transaction category based on the payee aggregate group (i.e. all transactions under the
+  "Grocery Stores" group can be set to the "Groceries" category).
 
 - **Bank Sync** - Triggers a bank sync for all accounts in Actual. This is useful if you want to automate the bank sync
   process.

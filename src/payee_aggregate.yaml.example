@@ -1,36 +1,48 @@
 # NOTE: Will always try to match whole words (wraps a leading & trailing \b around the regex automatically).
 #       If you want to match not whole words, you can use .+? at the beginning and/or end of the regex.
 
-# Reise
-Taxfree:
-  - Duty ?free
-  - Tax ?free
+# The group currently does nothing (except provide a way to group multiple regexes under a single name).
+# To automatically set a category for a category, use a key named "category" with the value of the category name.
 
-# Parkering
-Easypark: easypark
-Autopay: autopay
+Reise:
+  Taxfree:
+    - Duty ?free
+    - Tax ?free
 
-# Spill
-Steam: steam
+Parkering:
+  category: Parkering
+  Easypark: easypark
+  Autopay: autopay
 
-# Elektronikk
-Elkjøp: elkjoe?p
-Elektroimportøren: elektroimportoeren
-Kjell & Co:
-  - kjell ?& ?co
-  - kjell ?& ?company
-Komplett: komplett\.no
-Proshop: proshop
+Spill:
+  Steam: steam
 
-# Byggevarehus
-Biltema: biltema
-Coop Obs Bygg: coop obs bygg
-IKEA: ikea
-Jula: jula
+Elektronikk:
+  Elkjøp: elkjoe?p
+  Elektroimportøren: elektroimportoeren
+  Kjell & Co:
+    - kjell ?& ?co
+    - kjell ?& ?company
+  Komplett: komplett\.no
+  Proshop: proshop
 
-# Matbutikker
-Coop Obs: (coop )?obs ?(?!bygg)
-Coop Extra: extra
-Kiwi: kiwi
-Helgø Meny: helgoe meny
-Rema 1000: rema
+Byggevarehus:
+  Biltema: biltema
+  Coop Obs Bygg: coop obs bygg
+  IKEA: ikea
+  Jula: jula
+
+Matbutikker:
+  category: Mat
+  Coop Obs: (coop )?obs ?(?!bygg)
+  Coop Extra: extra
+  Kiwi: kiwi
+  Helgø Meny: helgoe meny
+  Rema 1000: rema
+
+Elbillading:
+  category: Elbillading
+  Circle K Lading: ev-\d+.*circle ?k?
+
+Bensinstasjoner:
+  Circle K: ^(?!ev-\d+).*circle ?k

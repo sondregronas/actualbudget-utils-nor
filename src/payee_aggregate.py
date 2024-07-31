@@ -20,7 +20,7 @@ def parse_payee_aggregate() -> dict:
 
     Returns: {'payee': {'regex': 'regex', 'category': 'category | None'}}
     """
-    DIR = 'payee_aggregates'
+    DIR = 'config'
     EXTRA_DIR = f'aggregate_groups'
     with open(Path(f'{DIR}/payee_aggregate.yaml'), 'r', encoding='utf8') as f:
         # Convert lists to (|)-separated, if it is a list, otherwise return the value as is

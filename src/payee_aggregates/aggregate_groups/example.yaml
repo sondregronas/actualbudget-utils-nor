@@ -1,6 +1,0 @@
-# Refer to this file as `file: example.yaml` in a group of the payee_aggregate.yaml file
-
-An Extra Payee: from an extra file
-So You Can:
-  - Keep the main file clean
-  - Sort stuff easier by category

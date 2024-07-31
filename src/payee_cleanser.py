@@ -7,12 +7,13 @@ Not to be confused with payee_aggregate.py that aggregates payees based on regex
 """
 import logging
 import re
+from pathlib import Path
 
 from actual.queries import get_payees, get_or_create_payee
 
 
 def load_payee_cleanser():
-    with open('payee_cleanser.txt', 'r', encoding='utf8') as f:
+    with open(Path('config/payee_cleanser.txt'), 'r', encoding='utf8') as f:
         lines = f.read().splitlines()
         # Return the line if it is not empty and does not start with a comment
         return [line for line in lines
@@ -50,3 +51,7 @@ def payee_cleanser(actual):
     for payee in to_delete:
         logging.info(f'Deleting payee {payee.name} as it has no transactions')
         payee.delete()
+
+
+if __name__ == '__main__':
+    print(load_payee_cleanser())

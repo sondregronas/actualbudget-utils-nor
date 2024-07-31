@@ -1,6 +1,7 @@
 payee_aggregate.yaml
 payee_cleanser.txt
-aggregate_groups/
+
+aggregate_groups/*
 !aggregate_groups/example.yaml
 
 # Byte-compiled / optimized / DLL files

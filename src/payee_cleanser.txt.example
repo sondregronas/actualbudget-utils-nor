@@ -1,0 +1,13 @@
+# Careful to not put any wildcards, as this function DELETES the matches, whereas aggregate will replace them
+
+# Remove domains
+\.\w{2,3}\b
+
+# Payment processors
+\bpaypal\s*\*?
+\bpp\*
+\bklarna\s*\*?
+\bspc\*
+\buzr\*
+\bzettle\_?\*
+\bsumup\s*\*?

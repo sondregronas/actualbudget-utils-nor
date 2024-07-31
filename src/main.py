@@ -11,6 +11,7 @@ from assets import update_asset_value
 from carvalue import get_car_median_estimates
 from hjemla import get_house_median_estimates
 from payee_aggregate import aggregate_all_payees
+from payee_cleanser import payee_cleanser
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -32,10 +33,12 @@ ACTUAL_MORTGAGE_ACCOUNT = os.getenv('ACTUAL_MORTGAGE_ACCOUNT', None)
 @click.option('--all', '-a', help='Update everything', is_flag=True)
 @click.option('--aggregate', '-p', help='Aggregate all payees based on the payee aggregates configuration',
               is_flag=True)
+@click.option('--cleanse-payees', '-e', help='Cleanse payee names based on the payee cleanser configuration',
+              is_flag=True)
 @click.option('--car', '-c', help='Update car values', is_flag=True)
 @click.option('--house', '-h', help='Update house values', is_flag=True)
 @click.option('--bank-sync', '-b', help='Run bank sync on all accounts', is_flag=True)
-def main(debug, dry_run, all, aggregate, car, house, bank_sync):
+def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug('Debug logging enabled')
@@ -50,6 +53,7 @@ def main(debug, dry_run, all, aggregate, car, house, bank_sync):
 
     if all:
         aggregate = True
+        cleanse_payees = True
         car = True
         house = True
         bank_sync = True
@@ -60,6 +64,7 @@ def main(debug, dry_run, all, aggregate, car, house, bank_sync):
     logger.info(f'Houses: {house}')
     logger.info(f'Car: {car}')
     logger.info(f'Payee aggregation: {aggregate}')
+    logger.info(f'Payee cleansing: {cleanse_payees}')
     logger.info(f'Bank sync: {bank_sync}')
     logger.info('-' * 40)
 
@@ -94,6 +99,8 @@ def main(debug, dry_run, all, aggregate, car, house, bank_sync):
             [update_asset(house, value) for house, value in house_values.items()]
         if aggregate:
             aggregate_all_payees(actual, all_transactions)
+        if cleanse_payees:
+            payee_cleanser(actual)
 
         # Run rules
         actual.run_rules()

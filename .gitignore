@@ -1,4 +1,5 @@
 payee_aggregate.yaml
+payee_cleanser.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

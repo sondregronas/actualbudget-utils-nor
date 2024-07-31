@@ -1,5 +1,6 @@
 import re
 from logging import getLogger
+from pathlib import Path
 
 import yaml
 from actual.queries import get_or_create_payee, get_payee, get_or_create_category
@@ -14,20 +15,27 @@ def add_regex_boundaries(entry: str):
     return entry
 
 
-def read_payee_aggregate() -> dict:
+def parse_payee_aggregate() -> dict:
     """Read the payee aggregate configuration from a YAML file and return it as a dictionary
 
     Returns: {'payee': {'regex': 'regex', 'category': 'category | None'}}
     """
-    with open('payee_aggregate.yaml', 'r', encoding='utf8') as f:
+    DIR = 'payee_aggregates'
+    EXTRA_DIR = f'aggregate_groups'
+    with open(Path(f'{DIR}/payee_aggregate.yaml'), 'r', encoding='utf8') as f:
         # Convert lists to (|)-separated, if it is a list, otherwise return the value as is
         payee_aggregates = dict()
         values = yaml.safe_load(f).values()
 
         for value in values:
             c = value.get('category', None)
+            # Load external file if it is defined for the payee aggregate group
+            f = value.get('file', None)
+            if f:
+                f = f'{DIR}/{EXTRA_DIR}/{f.strip()}{".yaml" if not f.endswith(".yaml") else ""}'
+                value.update(yaml.safe_load(open(Path(f), 'r', encoding='utf8')))
             for k, v in value.items():
-                if k == 'category':
+                if k in ['category', 'file']:
                     continue
                 if isinstance(v, list):
                     entries = [add_regex_boundaries(str(entry)) for entry in v]
@@ -52,9 +60,9 @@ def _aggregate(transaction, payee_aggregates):
 def aggregate_all_payees(actual, transactions, update_category=True):
     """Aggregate all payees based on the payee aggregates configuration"""
     # TODO: Split this function into smaller functions for better readability
-    payee_aggregates = read_payee_aggregate()
+    payee_aggregates = parse_payee_aggregate()
     logging.debug(f'Payee aggregates: {payee_aggregates}')
-    merged_payees = {}
+    merged_payees = dict()
     for transaction in transactions:
         # Find payee aggregate for the transaction
         new_payee, to_be_aggregated = _aggregate(transaction, payee_aggregates)
@@ -87,7 +95,7 @@ def aggregate_all_payees(actual, transactions, update_category=True):
 
         # Keep track of which payees are merged to which new payee, so we can merge them later
         if should_change_payee and new_payee not in merged_payees:
-            merged_payees[new_payee] = []
+            merged_payees[new_payee] = list()
         if should_change_payee and transaction.payee.id not in merged_payees[new_payee]:
             logging.info(f'Aggregated payee: {transaction.payee.name} -> {new_payee}')
             merged_payees[new_payee].append((transaction.payee.id, transaction.payee.name))
@@ -118,3 +126,7 @@ def aggregate_all_payees(actual, transactions, update_category=True):
         logging.debug(f'Aggregated payees: {merged_payees}')
     else:
         logging.info('No payees to aggregate')
+
+
+if __name__ == '__main__':
+    print(parse_payee_aggregate())

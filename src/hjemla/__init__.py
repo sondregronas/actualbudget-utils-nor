@@ -58,7 +58,7 @@ def get_house_median_estimates(hjemla_urls: list[str]) -> dict[str, int]:
     :param hjemla_urls: List of URLs of the houses where the values are located (Se mer modal)
     :return: Dictionary of house names and their median values
     """
-    output = {}
+    output = dict()
     for hjemla_url in hjemla_urls:
         host = hjemla_url.split('https://')[1]
         url = host.split(':')[0] if ':' in host else host

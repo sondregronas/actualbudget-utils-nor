@@ -62,7 +62,7 @@ def get_car_median_estimates(license_plates: list[str]) -> dict[str, int]:
     :param license_plates: List of license plates
     :return: Dictionary with license plates as keys and median values as values
     """
-    output = {}
+    output = dict()
     for license_plate in license_plates:
         reg = license_plate.split(':')[0] if ':' in license_plate else license_plate
         percentage = int(license_plate.split(':')[1]) if ':' in license_plate else 100

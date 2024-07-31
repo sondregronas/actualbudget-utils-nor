@@ -4,6 +4,17 @@
 # The group currently does nothing (except provide a way to group multiple regexes under a single name).
 # To automatically set a category for a category, use a key named "category" with the value of the category name.
 
+External Files:
+  # Optional file to load within the payee_aggregates folder under this group
+  file: example.yaml
+  # Optional category to set for all transactions in the file under the payees
+  category: Extra stuff
+  # Add a list of payees, K: V pairs, where K is the payee and V is a regex or a list of regexes
+  Payee: regex
+  Payee2:
+    - regex1.*
+    - regex2 \d{2}
+
 Reise:
   Taxfree:
     - Duty ?free
@@ -16,6 +27,7 @@ Parkering:
 
 Spill:
   Steam: steam
+  HumbleBundle: humblebundl.*
 
 Elektronikk:
   Elkjøp: elkjoe?p

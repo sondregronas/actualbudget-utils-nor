@@ -49,7 +49,7 @@ def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
     license_plates = os.getenv('LICENSE_PLATES', '').split(',')
     houses = os.getenv('HJEMLA_URLS', '').split(',')
 
-    car_values, house_values = {}, {}
+    car_values, house_values = dict(), dict()
 
     if all:
         aggregate = True
@@ -79,7 +79,7 @@ def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
         transactions = get_transactions(actual.session)
         logger.info(f'Found {len(transactions)} transactions')
 
-        new_transactions = []
+        new_transactions = list()
         if bank_sync:
             new_transactions = actual.run_bank_sync()
             logger.info(f'Imported {len(new_transactions)} new transactions from bank sync')

@@ -1,8 +1,8 @@
 payee_aggregate.yaml
 payee_cleanser.txt
 
-aggregate_groups/*
-!aggregate_groups/example.yaml
+src/config/aggregate_groups/*
+!src/config/aggregate_groups/example.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

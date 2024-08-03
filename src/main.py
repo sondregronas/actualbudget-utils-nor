@@ -4,7 +4,7 @@ from functools import partial
 
 import click
 from actual import Actual
-from actual.queries import get_transactions
+from actual.queries import get_transactions, get_payees
 from dotenv import load_dotenv
 
 from assets import update_asset_value
@@ -12,6 +12,7 @@ from carvalue import get_car_median_estimates
 from hjemla import get_house_median_estimates
 from payee_aggregate import aggregate_all_payees
 from payee_cleanser import payee_cleanser
+from transfer_recognition import recognize_and_merge_transfers
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -35,10 +36,11 @@ ACTUAL_MORTGAGE_ACCOUNT = os.getenv('ACTUAL_MORTGAGE_ACCOUNT', None)
               is_flag=True)
 @click.option('--cleanse-payees', '-e', help='Cleanse payee names based on the payee cleanser configuration',
               is_flag=True)
+@click.option('--transfer-recognition', '-t', help='Recognize & set transactions to transfers', is_flag=True)
 @click.option('--car', '-c', help='Update car values', is_flag=True)
 @click.option('--house', '-h', help='Update house values', is_flag=True)
 @click.option('--bank-sync', '-b', help='Run bank sync on all accounts', is_flag=True)
-def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
+def main(debug, dry_run, all, aggregate, transfer_recognition, cleanse_payees, car, house, bank_sync):
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug('Debug logging enabled')
@@ -54,6 +56,7 @@ def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
     if all:
         aggregate = True
         cleanse_payees = True
+        transfer_recognition = True
         car = True
         house = True
         bank_sync = True
@@ -65,6 +68,7 @@ def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
     logger.info(f'Car: {car}')
     logger.info(f'Payee aggregation: {aggregate}')
     logger.info(f'Payee cleansing: {cleanse_payees}')
+    logger.info(f'Transfer recognition: {transfer_recognition}')
     logger.info(f'Bank sync: {bank_sync}')
     logger.info('-' * 40)
 
@@ -77,6 +81,7 @@ def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
                 file=ACTUAL_FILE) as actual:
 
         transactions = get_transactions(actual.session)
+        payees = get_payees(actual.session)
         logger.info(f'Found {len(transactions)} transactions')
 
         new_transactions = list()
@@ -88,19 +93,23 @@ def main(debug, dry_run, all, aggregate, cleanse_payees, car, house, bank_sync):
 
         # Partial function to update assets
         update_asset = partial(update_asset_value,
-                               account=ACTUAL_CAR_ACCOUNT,
                                payee=ACTUAL_PAYEE,
                                actual=actual,
                                transactions=all_transactions)
 
         if car:
-            [update_asset(car, value) for car, value in car_values.items()]
+            [update_asset(car, value, account=ACTUAL_CAR_ACCOUNT) for car, value in car_values.items()]
         if house:
-            [update_asset(house, value) for house, value in house_values.items()]
+            [update_asset(house, value, account=ACTUAL_MORTGAGE_ACCOUNT) for house, value in house_values.items()]
         if aggregate:
             aggregate_all_payees(actual, all_transactions)
+            payees = get_payees(actual.session)  # Refresh payees
         if cleanse_payees:
             payee_cleanser(actual)
+            payees = get_payees(actual.session)  # Refresh payees
+        if transfer_recognition:
+            transfer_payees = [p for p in payees if p.transfer_acct]
+            recognize_and_merge_transfers(all_transactions, transfer_payees)
 
         # Run rules
         actual.run_rules()

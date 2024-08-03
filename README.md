@@ -28,6 +28,10 @@ TODO:
   from the payee name). Also strips any extra whitespace from the payee names. I.e. `\.\w{2,3}\b` will remove any domain
   names from the payee name, `\bpaypal\b` will remove the word "paypal" from the payee name.
 
+- **Transfer Recognition** - Recognizes transfers between accounts and marks them as transfers in Actual. By default
+  bank syncs will create two transactions for each transfer, one in each account. This module will change the payee to
+  be a proper transfer.
+
 - **Bank Sync** - Triggers a bank sync for all accounts in Actual. This is useful if you want to automate the bank sync
   process.
 
@@ -39,17 +43,18 @@ Run `python main.py --help` to see the available options. Docker image coming so
 
 ```shell
 Options:
-  -v, --debug           Enable debug logging
-  --dry-run, --dry      Dry run
-  -a, --all             Update everything
-  -p, --aggregate       Aggregate all payees based on the payee aggregates
-                        configuration
-  -e, --cleanse-payees  Cleanse payee names based on the payee cleanser
-                        configuration
-  -c, --car             Update car values
-  -h, --house           Update house values
-  -b, --bank-sync       Run bank sync on all accounts
-  --help                Show this message and exit.
+  -v, --debug                 Enable debug logging
+  --dry-run, --dry            Dry run
+  -a, --all                   Update everything
+  -p, --aggregate             Aggregate all payees based on the payee
+                              aggregates configuration
+  -e, --cleanse-payees        Cleanse payee names based on the payee cleanser
+                              configuration
+  -t, --transfer-recognition  Recognize & set transactions to transfers
+  -c, --car                   Update car values
+  -h, --house                 Update house values
+  -b, --bank-sync             Run bank sync on all accounts
+  --help                      Show this message and exit.
   ```
 
 ## Modules
@@ -74,3 +79,7 @@ Cleans up the payee names based on the `payee_cleanser.txt` file. (Removes the s
 
 > **NOTE**: This DELETES the matched regexes from the payee name - while the Payee Aggregation module replaces the payee
 > name with the aggregated name. Be careful with the regexes you use.
+
+## Transfer Recognition
+
+Recognizes transfers between accounts and marks them as transfers in Actual. (Matching date, amount, and payee).

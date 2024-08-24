@@ -10,8 +10,8 @@ logging = getLogger()
 
 def add_regex_boundaries(entry: str):
     """Add regex word boundaries to the entry if they are not already there"""
-    entry = f'\\b{entry}' if not entry.startswith('\\b') else entry
-    entry = f'{entry}\\b' if not entry.endswith('\\b') else entry
+    entry = f"\\b{entry}" if not entry.startswith("\\b") else entry
+    entry = f"{entry}\\b" if not entry.endswith("\\b") else entry
     return entry
 
 
@@ -20,29 +20,29 @@ def parse_payee_aggregate() -> dict:
 
     Returns: {'payee': {'regex': 'regex', 'category': 'category | None'}}
     """
-    DIR = 'config'
-    EXTRA_DIR = f'aggregate_groups'
-    with open(Path(f'{DIR}/payee_aggregate.yaml'), 'r', encoding='utf8') as f:
+    DIR = "config"
+    EXTRA_DIR = f"aggregate_groups"
+    with open(Path(f"{DIR}/payee_aggregate.yaml"), "r", encoding="utf8") as f:
         # Convert lists to (|)-separated, if it is a list, otherwise return the value as is
         payee_aggregates = dict()
         values = yaml.safe_load(f).values()
 
         for value in values:
-            c = value.get('category', None)
+            c = value.get("category", None)
             # Load external file if it is defined for the payee aggregate group
-            f = value.get('file', None)
+            f = value.get("file", None)
             if f:
                 f = f'{DIR}/{EXTRA_DIR}/{f.strip()}{".yaml" if not f.endswith(".yaml") else ""}'
-                value.update(yaml.safe_load(open(Path(f), 'r', encoding='utf8')))
+                value.update(yaml.safe_load(open(Path(f), "r", encoding="utf8")))
             for k, v in value.items():
-                if k in ['category', 'file']:
+                if k in ["category", "file"]:
                     continue
                 if isinstance(v, list):
                     entries = [add_regex_boundaries(str(entry)) for entry in v]
                     regex = f"({'|'.join(entries)})"
                 else:
                     regex = add_regex_boundaries(str(v))
-                payee_aggregates[k] = {'regex': regex, 'category': c}
+                payee_aggregates[k] = {"regex": regex, "category": c}
         return payee_aggregates
 
 
@@ -52,7 +52,7 @@ def _aggregate(transaction, payee_aggregates):
         if not transaction.payee:
             return transaction.payee, False
         # Note: this can be pretty taxing..
-        if re.search(aggregate['regex'], transaction.payee.name, re.IGNORECASE):
+        if re.search(aggregate["regex"], transaction.payee.name, re.IGNORECASE):
             return payee, True
     return transaction.payee, False
 
@@ -61,7 +61,7 @@ def aggregate_all_payees(actual, transactions, update_category=True):
     """Aggregate all payees based on the payee aggregates configuration"""
     # TODO: Split this function into smaller functions for better readability
     payee_aggregates = parse_payee_aggregate()
-    logging.debug(f'Payee aggregates: {payee_aggregates}')
+    logging.debug(f"Payee aggregates: {payee_aggregates}")
     merged_payees = dict()
     for transaction in transactions:
         # Find payee aggregate for the transaction
@@ -72,12 +72,14 @@ def aggregate_all_payees(actual, transactions, update_category=True):
             continue
 
         # Get the new category for the payee, if it is defined in the payee aggregates configuration
-        new_category = payee_aggregates[new_payee].get('category', None)
+        new_category = payee_aggregates[new_payee].get("category", None)
         if new_category:
             new_category = get_or_create_category(actual.session, new_category)
 
         # Check if the payee or category should be updated
-        should_change_payee = transaction.payee.name != new_payee and transaction.payee.name not in payee_aggregates.keys()
+        should_change_payee = (
+            transaction.payee.name != new_payee and transaction.payee.name not in payee_aggregates.keys()
+        )
         should_update_category = all([update_category, not transaction.category, new_category])
 
         # Skip if there is nothing to update
@@ -97,7 +99,7 @@ def aggregate_all_payees(actual, transactions, update_category=True):
         if should_change_payee and new_payee not in merged_payees:
             merged_payees[new_payee] = list()
         if should_change_payee and transaction.payee.id not in merged_payees[new_payee]:
-            logging.info(f'Aggregated payee: {transaction.payee.name} -> {new_payee}')
+            logging.info(f"Aggregated payee: {transaction.payee.name} -> {new_payee}")
             merged_payees[new_payee].append((transaction.payee.id, transaction.payee.name))
 
         # Update the transaction to use the new payee
@@ -105,7 +107,7 @@ def aggregate_all_payees(actual, transactions, update_category=True):
 
         # Update the category of the payee (if it doesn't already have a category)
         if update_category and not transaction.category and new_category:
-            logging.info(f'Updated empty category for payee transaction ({new_payee}): None -> {new_category.name}')
+            logging.info(f"Updated empty category for payee transaction ({new_payee}): None -> {new_category.name}")
             transaction.category_id = new_category.id
 
     # Merge the payees (delete the old ones)
@@ -117,16 +119,16 @@ def aggregate_all_payees(actual, transactions, update_category=True):
                 continue
             p.delete()
             aggregation_count += 1
-            logging.info(f'Merged payee: ({name})')
-            logging.debug(f'Payee ID: ({id})')
+            logging.info(f"Merged payee: ({name})")
+            logging.debug(f"Payee ID: ({id})")
 
     # Fin
     if merged_payees:
-        logging.info(f'Aggregated {aggregation_count} payees')
-        logging.debug(f'Aggregated payees: {merged_payees}')
+        logging.info(f"Aggregated {aggregation_count} payees")
+        logging.debug(f"Aggregated payees: {merged_payees}")
     else:
-        logging.info('No payees to aggregate')
+        logging.info("No payees to aggregate")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(parse_payee_aggregate())

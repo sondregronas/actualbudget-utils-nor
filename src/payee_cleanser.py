@@ -5,6 +5,7 @@ I.e. strips Paypal* | Klarna* from the payee name.
 
 Not to be confused with payee_aggregate.py that aggregates payees based on regex.
 """
+
 import logging
 import re
 from pathlib import Path
@@ -13,11 +14,10 @@ from actual.queries import get_payees, get_or_create_payee
 
 
 def load_payee_cleanser():
-    with open(Path('config/payee_cleanser.txt'), 'r', encoding='utf8') as f:
+    with open(Path("config/payee_cleanser.txt"), "r", encoding="utf8") as f:
         lines = f.read().splitlines()
         # Return the line if it is not empty and does not start with a comment
-        return [line for line in lines
-                if line.strip() and not line.strip().startswith('#')]
+        return [line for line in lines if line.strip() and not line.strip().startswith("#")]
 
 
 def payee_cleanser(actual):
@@ -29,8 +29,8 @@ def payee_cleanser(actual):
         n = payee.name
         for regex in payee_cleansers:
             # print(regex)
-            n = re.sub(regex, '', n, flags=re.IGNORECASE)
-            n = re.sub(r'\s+', ' ', n).strip()
+            n = re.sub(regex, "", n, flags=re.IGNORECASE)
+            n = re.sub(r"\s+", " ", n).strip()
         if n == payee.name:
             continue
 
@@ -45,13 +45,13 @@ def payee_cleanser(actual):
             t.payee_id = new_payee.id
         if payee.id not in t_ids and payee not in to_delete:
             to_delete.append(payee)
-        logging.info(f'Payee {payee.name} has been cleansed to {n}')
+        logging.info(f"Payee {payee.name} has been cleansed to {n}")
 
     # Delete empty payees
     for payee in to_delete:
-        logging.info(f'Deleting payee {payee.name} as it has no transactions')
+        logging.info(f"Deleting payee {payee.name} as it has no transactions")
         payee.delete()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(load_payee_cleanser())

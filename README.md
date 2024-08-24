@@ -33,12 +33,15 @@ TODO:
   be a proper transfer.
 
 - **Bank Sync** - Triggers a bank sync for all accounts in Actual. This is useful if you want to automate the bank sync
-  process.
+  process. (Might not work, disabled in --all for now).
+
+- **Remove Uncleared** - Removes uncleared transactions from bank sync accounts.
 
 ## Usage
 
 Some environment variables are required to run the script, see the `.env.example` file for more details.
 
+Run `python main.py --help` to see the available options. Docker image coming soon.
 Run `python main.py --help` to see the available options. Docker image coming soon.
 
 ```shell
@@ -54,6 +57,8 @@ Options:
   -c, --car                   Update car values
   -h, --house                 Update house values
   -b, --bank-sync             Run bank sync on all accounts
+  -u, --remove-uncleared      Removes all uncleared transactions from bank
+                              sync accounts
   --help                      Show this message and exit.
   ```
 

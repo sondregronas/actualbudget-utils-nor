@@ -12,7 +12,7 @@ services:
     image: filebrowser/filebrowser
     user: "${UID}:${GID}"
     ports:
-      - 5010:8080
+      - 5010:80
     volumes:
       - './data/config/:/data'
       - './data/filebrowser_cfg/:/config'

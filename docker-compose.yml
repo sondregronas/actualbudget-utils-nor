@@ -1,0 +1,21 @@
+services:
+  app:
+    container_name: actualutils
+    build: .
+    env_file:
+      - path: .env
+        required: true
+    volumes:
+      - './data/config/:/app/config/'
+    restart: unless-stopped
+  filebrowser:
+    image: filebrowser/filebrowser
+    user: "${UID}:${GID}"
+    ports:
+      - 5010:8080
+    volumes:
+      - './data/config/:/data'
+      - './data/filebrowser_cfg/:/config'
+    environment:
+      - FB_NOAUTH=noauth
+    restart: unless-stopped

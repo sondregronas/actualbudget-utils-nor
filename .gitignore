@@ -1,6 +1,6 @@
 payee_aggregate.yaml
 payee_cleanser.txt
-
+data/
 src/config/aggregate_groups/*
 !src/config/aggregate_groups/example.yaml
 

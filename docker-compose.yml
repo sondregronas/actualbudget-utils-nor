@@ -14,7 +14,7 @@ services:
     ports:
       - 5010:80
     volumes:
-      - './data/config/:/data'
+      - './data/config/:/srv'
       - './data/filebrowser_cfg/:/config'
     environment:
       - FB_NOAUTH=noauth

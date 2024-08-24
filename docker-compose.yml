@@ -20,4 +20,4 @@ services:
     environment:
       - FB_NOAUTH=noauth
     restart: unless-stopped
-    entrypoint: [ "filebrowser", "-d", "/database/filebrowser.db" ]
+    entrypoint: [ "/filebrowser", "-d", "/database/filebrowser.db" ]

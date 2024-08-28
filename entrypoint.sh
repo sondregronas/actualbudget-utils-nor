@@ -9,4 +9,4 @@ echo "5 0 * * 0 /usr/local/bin/python /app/main.py -ch" >> /etc/cron.d/entrypoin
 crontab /etc/cron.d/entrypoint
 service cron restart
 echo "Cron job has been set"
-cron -f
+tail -f /dev/null

@@ -4,6 +4,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-gpu")
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+chrome_options.add_argument(f'user-agent={user_agent}')
+
 
 class HouseEstimate:
     """
@@ -20,7 +27,7 @@ class HouseEstimate:
         # X,X - X,X millioner
         target_class = "hjemla-estimate"
 
-        with webdriver.Chrome() as s:
+        with webdriver.Chrome(options=chrome_options) as s:
             s.get(hjemla_url)
             try:
                 WebDriverWait(s, 10).until(

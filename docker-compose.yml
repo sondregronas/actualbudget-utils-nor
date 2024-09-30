@@ -3,8 +3,7 @@ services:
     container_name: actualutils
     build: .
     env_file:
-      - path: .env
-        required: true
+      - .env
     volumes:
       - './data/config/:/app/config/'
     restart: unless-stopped

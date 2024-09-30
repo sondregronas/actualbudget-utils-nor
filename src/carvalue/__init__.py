@@ -4,6 +4,13 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-gpu")
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
+chrome_options.add_argument(f'user-agent={user_agent}')
+
 
 class CarEstimate:
     """
@@ -31,7 +38,7 @@ class CarEstimate:
         # This gets loaded when the price is loaded (otherwise it's just an SVG)
         subscript_class = "subscript"
 
-        with webdriver.Chrome() as s:
+        with webdriver.Chrome(options=chrome_options) as s:
             s.get(url)
             try:
                 # TODO: wait for SVG to disappear in the target_class instead of looking for a subscript class?
@@ -44,8 +51,9 @@ class CarEstimate:
                 element.text.replace(" ", "").replace("kr", "")
                 for element in s.find_elements(By.CLASS_NAME, target_class)
             ]
-            self.min = int(int(elements[2].split("-")[0]) * percentage / 100)
-            self.max = int(int(elements[2].split("-")[1]) * percentage / 100)
+            element_with_dash = [element for element in elements if "-" in element][0]
+            self.min = int(int(element_with_dash.split("-")[0]) * percentage / 100)
+            self.max = int(int(element_with_dash.split("-")[1]) * percentage / 100)
             self.median = int((self.min + self.max) / 2)
 
     def __str__(self):

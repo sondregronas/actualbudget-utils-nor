@@ -6,7 +6,7 @@ ENV TZ='Europe/Oslo'
 
 RUN apt-get update -qq -y && \
     apt-get install -y \
-        tzdata git cron \
+        tzdata git \
         libasound2 \
         libatk-bridge2.0-0 \
         libgtk-4-1 \
@@ -44,7 +44,4 @@ RUN wget -q -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-test
 
 COPY src/ .
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["sh", "/entrypoint.sh"]
+ENTRYPOINT ["python", "/app/routine.py"]

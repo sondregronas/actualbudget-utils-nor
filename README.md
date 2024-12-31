@@ -70,9 +70,9 @@ Gets the value of a car based on the registration number via `https://regnr.no/[
 
 ### Hjemla
 
-Gets the value of a house based on the hjemla URL where the house price is listed ("Se mer" modal).
+Gets the value of a house based using hjemla.no (City=Address=Zip code).
 
-Example URL: `https://www.hjemla.no/boligkart?search=lat_lon_addresse-1_1234_Postnummer&z=16&showPanel=true&unit=H1234`
+Address pair example: `By=Addresse 12=1234` (:50 for 50%, comma separated for multiple addresses)
 
 ### Payee Aggregation
 

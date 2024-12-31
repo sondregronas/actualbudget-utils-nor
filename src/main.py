@@ -80,7 +80,7 @@ def main(
         logging.info("Dry run enabled - no changes will be committed")
 
     license_plates = os.getenv("LICENSE_PLATES", "").split(",")
-    houses = os.getenv("HJEMLA_URLS", "").split(",")
+    houses = os.getenv("ADDRESS_PAIRS", "").split(",")
 
     car_values, house_values = dict(), dict()
 

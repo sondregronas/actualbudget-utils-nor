@@ -1,60 +1,26 @@
-from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.ui import WebDriverWait
-
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-gpu")
-user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-chrome_options.add_argument(f'user-agent={user_agent}')
+import requests
 
 
 class CarEstimate:
-    """
-    Get the estimated value of a car given its license plate
-
-    :param license_plate: License plate of the car
-    :ivar min: Minimum value of the car
-    :ivar max: Maximum value of the car
-    :ivar median: Median value of the car
-    """
-
     def __init__(self, license_plate: str, percentage: int = 100):
         """
         Get the value of a car given its license plate
-
-        :param license_plate: License plate of the car
-        :param percentage: Percentage of the value to get (default 100)
         """
-        url = f"https://regnr.no/{license_plate.upper()}"
+        url = f"https://regnr.no/api/pricing?query={license_plate.upper()}"
 
-        # 0: Heftelser, 1: Forhandlerpris, 2: Privatpris (min-max) 3: ..
-        target_class = "text-price"
+        response = requests.get(url)
+        response.raise_for_status()
 
-        # If this isn't in the page, the license plate doesn't exist
-        # This gets loaded when the price is loaded (otherwise it's just an SVG)
-        subscript_class = "subscript"
+        data = response.json()
 
-        with webdriver.Chrome(options=chrome_options) as s:
-            s.get(url)
-            try:
-                # TODO: wait for SVG to disappear in the target_class instead of looking for a subscript class?
-                WebDriverWait(s, 10).until(
-                    expected_conditions.presence_of_element_located((By.CLASS_NAME, subscript_class))
-                )
-            except TimeoutException:
-                raise ValueError(f"Could not load prices for license plate {license_plate}")
-            elements = [
-                element.text.replace(" ", "").replace("kr", "")
-                for element in s.find_elements(By.CLASS_NAME, target_class)
-            ]
-            element_with_dash = [element for element in elements if "-" in element][0]
-            self.min = int(int(element_with_dash.split("-")[0]) * percentage / 100)
-            self.max = int(int(element_with_dash.split("-")[1]) * percentage / 100)
-            self.median = int((self.min + self.max) / 2)
+        if not data["estimate"]:
+            raise ValueError(f"Could not find estimate for license plate {license_plate}")
+
+        element_with_dash = data["estimate"].replace(" ", "")
+
+        self.min = int(int(element_with_dash.split("-")[0]) * percentage / 100)
+        self.max = int(int(element_with_dash.split("-")[1]) * percentage / 100)
+        self.median = int((self.min + self.max) / 2)
 
     def __str__(self):
         """

@@ -7,7 +7,7 @@ class HouseEstimate:
         Get the value of a house given its city, address and zip code
         """
 
-        url = f"https://consumer-service.hjemla.no/public/properties/unit/{city}?streetaddress={address}&postalCode={zip_code}"
+        url = f"https://consumer-service-hjemla-prod.propcloud.no/public/properties/unit/{city}?streetaddress={address}&postalCode={zip_code}"
 
         response = requests.get(url)
         response.raise_for_status()

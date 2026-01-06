@@ -4,13 +4,10 @@
 
 Some Norway based utilities for Actual for my personal use.
 
-TODO:
-
-- [ ] Docker image that runs the script periodically, instead of relying on cron
-
 ## What it does (for now)
 
-- **Car Value** - Queries regnr.no to get an estimated median value of a car based on the license plate _via selenium_.
+- **Car Value (broken)** - Queries regnr.no to get an estimated median value of a car based on the license plate _via
+  selenium_.
   The difference is posted to the Actual budget as a transaction based on the last known value (LKV). Only updates the
   assets estimated value (You can still add/track debt yourself in the same account).
 
@@ -32,8 +29,8 @@ TODO:
   bank syncs will create two transactions for each transfer, one in each account. This module will change the payee to
   be a proper transfer.
 
-- **Bank Sync** - Triggers a bank sync for all accounts in Actual. This is useful if you want to automate the bank sync
-  process. (Might not work, disabled in --all for now).
+- **Bank Sync** - Triggers a bank sync for all accounts in Actual. (Might not work, disabled in --all for now).
+  See https://github.com/psybers/actual-helpers for a more robust bank sync solution.
 
 - **Remove Uncleared** - Removes uncleared transactions from bank sync accounts.
 
@@ -56,7 +53,7 @@ Options:
   -t, --transfer-recognition  Recognize & set transactions to transfers
   -c, --car                   Update car values
   -h, --house                 Update house values
-  -b, --bank-sync             Run bank sync on all accounts
+  -b, --bank-sync             Run bank sync on all accounts (broken, use https://github.com/psybers/actual-helpers instead)
   -u, --remove-uncleared      Removes all uncleared transactions from bank
                               sync accounts
   --help                      Show this message and exit.
@@ -64,7 +61,7 @@ Options:
 
 ## Modules
 
-### Car Value
+### Car Value (Broken)
 
 Gets the value of a car based on the registration number via `https://regnr.no/[REGISTRATION_NUMBER]`
 

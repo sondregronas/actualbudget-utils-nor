@@ -59,5 +59,10 @@ def recognize_and_merge_transfers(transactions: list[Transactions], payees: list
         logging.info(f"Merging transaction into transfer: {t1.account.name} ({t1.amount}) <-> {t2.account.name}")
         logging.debug(f"Transfer pair: {t1.acct} -> {t2.acct}")
         # Update the payee IDs
+        if not t1.account.offbudget:
+            t2.category_id = None
+        if not t2.account.offbudget:
+            t1.category_id = None
         t1.payee_id = get_transfer_payee(t2.acct, payees).id
         t2.payee_id = get_transfer_payee(t1.acct, payees).id
+        t1.transferred_id = t2.id

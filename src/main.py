@@ -57,20 +57,20 @@ ACTUAL_MORTGAGE_ACCOUNT = os.getenv("ACTUAL_MORTGAGE_ACCOUNT", None)
 @click.option(
     "--remove-uncleared",
     "-u",
-    help="Removes all uncleared transactions from bank sync accounts",
+    help="Removes all uncleared transactions from bank sync accounts. Also deletes fresh entries that might not have cleared _properly_ yet.",
     is_flag=True,
 )
 def main(
-        debug,
-        dry_run,
-        all,
-        aggregate,
-        transfer_recognition,
-        cleanse_payees,
-        car,
-        house,
-        bank_sync,
-        remove_uncleared,
+    debug,
+    dry_run,
+    all,
+    aggregate,
+    transfer_recognition,
+    cleanse_payees,
+    car,
+    house,
+    bank_sync,
+    remove_uncleared,
 ):
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
@@ -111,10 +111,10 @@ def main(
         house_values = get_house_median_estimates(houses)
 
     with Actual(
-            base_url=ACTUAL_URL,
-            password=ACTUAL_PWD,
-            encryption_password=ACTUAL_ENCRYPTION_PASSWORD,
-            file=ACTUAL_FILE,
+        base_url=ACTUAL_URL,
+        password=ACTUAL_PWD,
+        encryption_password=ACTUAL_ENCRYPTION_PASSWORD,
+        file=ACTUAL_FILE,
     ) as actual:
         transactions = get_transactions(actual.session)
         payees = get_payees(actual.session)

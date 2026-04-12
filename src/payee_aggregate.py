@@ -73,6 +73,13 @@ def aggregate_all_payees(actual, transactions, update_category=True):
 
         # Get the new category for the payee, if it is defined in the payee aggregates configuration
         new_category = payee_aggregates[new_payee].get("category", None)
+
+        # Delete the transaction if the category is "deleteme"
+        if new_category and new_category.lower() == "deleteme":
+            logging.info(f"Deleting transaction with payee: {transaction.payee.name} (category: deleteme)")
+            transaction.delete()
+            continue
+
         if new_category:
             new_category = get_or_create_category(actual.session, new_category)
 

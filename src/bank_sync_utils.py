@@ -9,3 +9,6 @@ def remove_uncleared_from_bank_synced(transactions: list[Transactions]):
             if not t.cleared:
                 t.delete()
                 logging.info(f"Deleted uncleared transaction: {t=}")
+            if not t.payee_id:
+                t.delete()
+                logging.info(f"Deleted transaction without payee: {t=}")

@@ -10,8 +10,8 @@ logging = getLogger()
 
 def add_regex_boundaries(entry: str):
     """Add regex word boundaries to the entry if they are not already there"""
-    entry = f"\\b{entry}" if not entry.startswith("\\b") else entry
-    entry = f"{entry}\\b" if not entry.endswith("\\b") else entry
+    entry = f"\\b{entry}" if not entry.startswith("\\b") and not entry.startswith("^") else entry
+    entry = f"{entry}\\b" if not entry.endswith("\\b") and not entry.endswith("$") else entry
     return entry
 
 
